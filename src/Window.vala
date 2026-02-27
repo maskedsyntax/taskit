@@ -33,6 +33,14 @@ namespace Taskit {
             add_project_btn.clicked.connect (on_add_project_clicked);
             header_bar.pack_start (add_project_btn);
             
+            var search_entry = new Gtk.SearchEntry ();
+            search_entry.placeholder_text = "Search tasks...";
+            search_entry.search_changed.connect (() => {
+                var query = search_entry.get_text ().down ();
+                filter_tasks_by_query (query);
+            });
+            header_bar.pack_end (search_entry);
+            
             main_box.append (header_bar);
             
             var paned = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
@@ -193,6 +201,21 @@ namespace Taskit {
                 add_task_row (task);
                 
                 task_entry.set_text ("");
+            }
+        }
+        
+        private void filter_tasks_by_query (string query) {
+            var child = task_list.get_first_child ();
+            while (child != null) {
+                if (child is Widgets.TaskRow) {
+                    var row = (Widgets.TaskRow) child;
+                    if (query == "" || row.task.title.down ().contains (query) || row.task.description.down ().contains (query)) {
+                        row.set_visible (true);
+                    } else {
+                        row.set_visible (false);
+                    }
+                }
+                child = child.get_next_sibling ();
             }
         }
         
