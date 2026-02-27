@@ -39,7 +39,15 @@ namespace Taskit {
                     is_completed INTEGER DEFAULT 0,
                     priority INTEGER DEFAULT 1,
                     due_date TEXT,
-                    project_id INTEGER
+                    project_id INTEGER,
+                    parent_id INTEGER DEFAULT -1,
+                    tags TEXT DEFAULT ''
+                );
+                
+                CREATE TABLE IF NOT EXISTS projects (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    color TEXT DEFAULT '#007bff'
                 );
             """;
             
@@ -51,7 +59,7 @@ namespace Taskit {
         
         public void insert_task (Models.Task task) {
             Statement stmt;
-            string query = "INSERT INTO tasks (title, description, is_completed, priority, due_date, project_id) VALUES (?, ?, ?, ?, ?, ?)";
+            string query = "INSERT INTO tasks (title, description, is_completed, priority, due_date, project_id, parent_id, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             
             if (db.prepare_v2 (query, -1, out stmt, null) == Sqlite.OK) {
                 stmt.bind_text (1, task.title);
@@ -60,6 +68,8 @@ namespace Taskit {
                 stmt.bind_int (4, task.priority);
                 stmt.bind_text (5, task.due_date != null ? task.due_date : "");
                 stmt.bind_int (6, task.project_id);
+                stmt.bind_int (7, task.parent_id);
+                stmt.bind_text (8, task.tags != null ? task.tags : "");
                 
                 if (stmt.step () != Sqlite.DONE) {
                     warning ("Error inserting task");
@@ -72,7 +82,7 @@ namespace Taskit {
         public Gee.ArrayList<Models.Task> get_all_tasks () {
             var list = new Gee.ArrayList<Models.Task> ();
             Statement stmt;
-            string query = "SELECT id, title, description, is_completed, priority, due_date, project_id FROM tasks";
+            string query = "SELECT id, title, description, is_completed, priority, due_date, project_id, parent_id, tags FROM tasks";
             
             if (db.prepare_v2 (query, -1, out stmt, null) == Sqlite.OK) {
                 while (stmt.step () == Sqlite.ROW) {
@@ -84,6 +94,8 @@ namespace Taskit {
                     task.priority = stmt.column_int (4);
                     task.due_date = stmt.column_text (5);
                     task.project_id = stmt.column_int (6);
+                    task.parent_id = stmt.column_int (7);
+                    task.tags = stmt.column_text (8);
                     list.add (task);
                 }
             }
@@ -93,7 +105,7 @@ namespace Taskit {
         
         public void update_task (Models.Task task) {
             Statement stmt;
-            string query = "UPDATE tasks SET title=?, description=?, is_completed=?, priority=?, due_date=?, project_id=? WHERE id=?";
+            string query = "UPDATE tasks SET title=?, description=?, is_completed=?, priority=?, due_date=?, project_id=?, parent_id=?, tags=? WHERE id=?";
             
             if (db.prepare_v2 (query, -1, out stmt, null) == Sqlite.OK) {
                 stmt.bind_text (1, task.title);
@@ -102,7 +114,9 @@ namespace Taskit {
                 stmt.bind_int (4, task.priority);
                 stmt.bind_text (5, task.due_date != null ? task.due_date : "");
                 stmt.bind_int (6, task.project_id);
-                stmt.bind_int (7, task.id);
+                stmt.bind_int (7, task.parent_id);
+                stmt.bind_text (8, task.tags != null ? task.tags : "");
+                stmt.bind_int (9, task.id);
                 
                 if (stmt.step () != Sqlite.DONE) {
                     warning ("Error updating task");
@@ -112,12 +126,75 @@ namespace Taskit {
         
         public void delete_task (int id) {
             Statement stmt;
-            string query = "DELETE FROM tasks WHERE id=?";
+            string query = "DELETE FROM tasks WHERE id=? OR parent_id=?";
+            
+            if (db.prepare_v2 (query, -1, out stmt, null) == Sqlite.OK) {
+                stmt.bind_int (1, id);
+                stmt.bind_int (2, id); // Cascade delete subtasks
+                if (stmt.step () != Sqlite.DONE) {
+                    warning ("Error deleting task");
+                }
+            }
+        }
+        
+        // Projects
+        public void insert_project (Models.Project project) {
+            Statement stmt;
+            string query = "INSERT INTO projects (name, color) VALUES (?, ?)";
+            
+            if (db.prepare_v2 (query, -1, out stmt, null) == Sqlite.OK) {
+                stmt.bind_text (1, project.name);
+                stmt.bind_text (2, project.color != null ? project.color : "#007bff");
+                
+                if (stmt.step () != Sqlite.DONE) {
+                    warning ("Error inserting project");
+                }
+                
+                project.id = (int)db.last_insert_rowid ();
+            }
+        }
+        
+        public Gee.ArrayList<Models.Project> get_all_projects () {
+            var list = new Gee.ArrayList<Models.Project> ();
+            Statement stmt;
+            string query = "SELECT id, name, color FROM projects";
+            
+            if (db.prepare_v2 (query, -1, out stmt, null) == Sqlite.OK) {
+                while (stmt.step () == Sqlite.ROW) {
+                    var project = new Models.Project ();
+                    project.id = stmt.column_int (0);
+                    project.name = stmt.column_text (1);
+                    project.color = stmt.column_text (2);
+                    list.add (project);
+                }
+            }
+            
+            return list;
+        }
+        
+        public void update_project (Models.Project project) {
+            Statement stmt;
+            string query = "UPDATE projects SET name=?, color=? WHERE id=?";
+            
+            if (db.prepare_v2 (query, -1, out stmt, null) == Sqlite.OK) {
+                stmt.bind_text (1, project.name);
+                stmt.bind_text (2, project.color != null ? project.color : "#007bff");
+                stmt.bind_int (3, project.id);
+                
+                if (stmt.step () != Sqlite.DONE) {
+                    warning ("Error updating project");
+                }
+            }
+        }
+        
+        public void delete_project (int id) {
+            Statement stmt;
+            string query = "DELETE FROM projects WHERE id=?";
             
             if (db.prepare_v2 (query, -1, out stmt, null) == Sqlite.OK) {
                 stmt.bind_int (1, id);
                 if (stmt.step () != Sqlite.DONE) {
-                    warning ("Error deleting task");
+                    warning ("Error deleting project");
                 }
             }
         }

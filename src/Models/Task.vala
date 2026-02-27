@@ -7,6 +7,8 @@ namespace Taskit.Models {
         public int priority { get; set; }
         public string due_date { get; set; }
         public int project_id { get; set; }
+        public int parent_id { get; set; }
+        public string tags { get; set; }
         
         public Task () {
             id = -1;
@@ -16,6 +18,8 @@ namespace Taskit.Models {
             priority = 1;
             due_date = "";
             project_id = -1;
+            parent_id = -1;
+            tags = "";
         }
     }
 }

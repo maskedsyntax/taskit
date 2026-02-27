@@ -5,7 +5,8 @@ taskit_sources = [
   'DatabaseManager.vala',
   'Models/Task.vala',
   'Models/Project.vala',
-  'Widgets/TaskRow.vala'
+  'Widgets/TaskRow.vala',
+  'Widgets/SidebarRow.vala'
 ]
 
 taskit_deps = [
