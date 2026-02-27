@@ -17,7 +17,13 @@ taskit_deps = [
   dependency('gee-0.8')
 ]
 
-executable('taskit', taskit_sources,
+taskit_resources = gnome.compile_resources('taskit-resources',
+  '../data/org.gnome.Taskit.gresource.xml',
+  source_dir: '../data',
+  c_name: 'taskit'
+)
+
+executable('taskit', taskit_sources + [taskit_resources],
   dependencies: taskit_deps,
   install: true,
 )

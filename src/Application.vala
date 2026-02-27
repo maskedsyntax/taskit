@@ -19,6 +19,9 @@ namespace Taskit {
         protected override void startup () {
             base.startup ();
             
+            // Register icons from resources
+            Gtk.IconTheme.get_for_display (Gdk.Display.get_default ()).add_resource_path ("/org/gnome/Taskit/icons");
+            
             // Database init
             DatabaseManager.get_instance().init_db();
             

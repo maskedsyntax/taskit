@@ -28,7 +28,7 @@ namespace Taskit {
             window_title = new Adw.WindowTitle ("Taskit", "All Tasks");
             header_bar.title_widget = window_title;
             
-            var add_project_btn = new Gtk.Button.from_icon_name ("folder-new-symbolic");
+            var add_project_btn = new Gtk.Button.from_icon_name ("taskit-folder-new-symbolic");
             add_project_btn.tooltip_text = "New Project";
             add_project_btn.clicked.connect (on_add_project_clicked);
             header_bar.pack_start (add_project_btn);
@@ -114,8 +114,8 @@ namespace Taskit {
             }
             
             // Smart lists
-            sidebar_list.append (new Widgets.SidebarRow ("all", "All Tasks", "view-list-symbolic"));
-            sidebar_list.append (new Widgets.SidebarRow ("today", "Today", "go-today-symbolic"));
+            sidebar_list.append (new Widgets.SidebarRow ("all", "All Tasks", "taskit-all-symbolic"));
+            sidebar_list.append (new Widgets.SidebarRow ("today", "Today", "taskit-today-symbolic"));
             
             // Projects header
             var sep = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
@@ -125,7 +125,7 @@ namespace Taskit {
             
             var projects = DatabaseManager.get_instance ().get_all_projects ();
             foreach (var project in projects) {
-                var row = new Widgets.SidebarRow ("project_" + project.id.to_string(), project.name, "folder-symbolic");
+                var row = new Widgets.SidebarRow ("project_" + project.id.to_string(), project.name, "taskit-folder-symbolic");
                 row.set_color (project.color);
                 sidebar_list.append (row);
             }

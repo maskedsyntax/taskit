@@ -33,14 +33,14 @@ namespace Taskit.Widgets {
             
             update_title_style ();
             
-            edit_button = new Gtk.Button.from_icon_name ("document-edit-symbolic");
+            edit_button = new Gtk.Button.from_icon_name ("taskit-edit-symbolic");
             edit_button.valign = Gtk.Align.CENTER;
             edit_button.add_css_class ("flat");
             edit_button.clicked.connect (() => {
                 task_edit_requested ();
             });
             
-            delete_button = new Gtk.Button.from_icon_name ("user-trash-symbolic");
+            delete_button = new Gtk.Button.from_icon_name ("taskit-trash-symbolic");
             delete_button.valign = Gtk.Align.CENTER;
             delete_button.add_css_class ("destructive-action");
             delete_button.clicked.connect (() => {

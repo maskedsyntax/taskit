@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/gnome/Taskit">
+    <file>icons/scalable/actions/taskit-plus-symbolic.svg</file>
+    <file>icons/scalable/actions/taskit-trash-symbolic.svg</file>
+    <file>icons/scalable/actions/taskit-edit-symbolic.svg</file>
+    <file>icons/scalable/actions/taskit-search-symbolic.svg</file>
+    <file>icons/scalable/actions/taskit-all-symbolic.svg</file>
+    <file>icons/scalable/actions/taskit-today-symbolic.svg</file>
+    <file>icons/scalable/places/taskit-folder-symbolic.svg</file>
+    <file>icons/scalable/actions/taskit-folder-new-symbolic.svg</file>
+  </gresource>
+</gresources>
