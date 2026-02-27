@@ -232,6 +232,14 @@ namespace Taskit {
                 DatabaseManager.get_instance ().delete_task (task.id);
                 task_list.remove (row);
             });
+            row.task_edit_requested.connect (() => {
+                var dialog = new Widgets.TaskDialog (this, task);
+                dialog.task_updated.connect (() => {
+                    DatabaseManager.get_instance ().update_task (task);
+                    load_tasks (); // Reload to reflect changes in the list
+                });
+                dialog.present ();
+            });
             task_list.append (row);
         }
     }

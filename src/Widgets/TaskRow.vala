@@ -4,9 +4,11 @@ namespace Taskit.Widgets {
         
         public signal void task_updated ();
         public signal void task_deleted ();
+        public signal void task_edit_requested ();
         
         private Gtk.CheckButton check_button;
         private Gtk.Label title_label;
+        private Gtk.Button edit_button;
         private Gtk.Button delete_button;
         
         public TaskRow (Models.Task task) {
@@ -31,6 +33,13 @@ namespace Taskit.Widgets {
             
             update_title_style ();
             
+            edit_button = new Gtk.Button.from_icon_name ("document-edit-symbolic");
+            edit_button.valign = Gtk.Align.CENTER;
+            edit_button.add_css_class ("flat");
+            edit_button.clicked.connect (() => {
+                task_edit_requested ();
+            });
+            
             delete_button = new Gtk.Button.from_icon_name ("user-trash-symbolic");
             delete_button.valign = Gtk.Align.CENTER;
             delete_button.add_css_class ("destructive-action");
@@ -40,6 +49,7 @@ namespace Taskit.Widgets {
             
             box.append (check_button);
             box.append (title_label);
+            box.append (edit_button);
             box.append (delete_button);
             
             this.child = box;
