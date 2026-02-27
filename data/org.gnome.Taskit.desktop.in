@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Taskit
+Comment=A custom task manager application
+Exec=taskit
+Icon=org.gnome.Taskit
+Terminal=false
+Type=Application
+Categories=Utility;GNOME;GTK;
+StartupNotify=true
