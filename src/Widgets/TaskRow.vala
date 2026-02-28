@@ -64,9 +64,11 @@ namespace Taskit.Widgets {
         private void update_title_style () {
             if (task.is_completed) {
                 title_label.set_markup ("<s>" + GLib.Markup.escape_text (task.title) + "</s>");
+                title_label.add_css_class (Granite.CssClass.DIM);
                 title_label.opacity = 0.5;
             } else {
                 title_label.set_markup (GLib.Markup.escape_text (task.title));
+                title_label.remove_css_class (Granite.CssClass.DIM);
                 title_label.opacity = 1.0;
             }
         }

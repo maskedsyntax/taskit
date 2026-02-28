@@ -3,7 +3,7 @@ namespace Taskit {
         private Gtk.ListBox sidebar_list;
         private Gtk.ListBox task_list;
         private Gtk.Entry task_entry;
-        private Adw.WindowTitle window_title;
+        private Granite.HeaderLabel window_title;
         
         private int current_project_id = -1;
         private string current_view = "all"; // "all", "today", "project"
@@ -24,12 +24,13 @@ namespace Taskit {
         private void build_ui () {
             var main_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             
-            var header_bar = new Adw.HeaderBar ();
-            window_title = new Adw.WindowTitle ("Taskit", "All Tasks");
-            header_bar.title_widget = window_title;
+            var header_bar = new Gtk.HeaderBar ();
+            window_title = new Granite.HeaderLabel ("Taskit");
+            header_bar.set_title_widget (window_title);
             
             var add_project_btn = new Gtk.Button.from_icon_name ("taskit-folder-new-symbolic");
             add_project_btn.tooltip_text = "New Project";
+            add_project_btn.add_css_class ("flat");
             add_project_btn.clicked.connect (on_add_project_clicked);
             header_bar.pack_start (add_project_btn);
             
@@ -51,23 +52,23 @@ namespace Taskit {
             // Sidebar
             var sidebar_scroll = new Gtk.ScrolledWindow ();
             sidebar_scroll.hscrollbar_policy = Gtk.PolicyType.NEVER;
+            sidebar_scroll.add_css_class (Granite.STYLE_CLASS_SIDEBAR);
             
             sidebar_list = new Gtk.ListBox ();
             sidebar_list.selection_mode = Gtk.SelectionMode.SINGLE;
-            sidebar_list.add_css_class ("navigation-sidebar");
             sidebar_list.row_selected.connect (on_sidebar_row_selected);
             
             sidebar_scroll.set_child (sidebar_list);
             
             // Main Content Area
             var content_area = new Gtk.Box (Gtk.Orientation.VERTICAL, 10);
-            content_area.margin_top = 20;
-            content_area.margin_start = 40;
-            content_area.margin_end = 40;
-            content_area.margin_bottom = 20;
+            content_area.margin_top = 24;
+            content_area.margin_start = 48;
+            content_area.margin_end = 48;
+            content_area.margin_bottom = 24;
             
             // Input for new task
-            var input_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 10);
+            var input_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             task_entry = new Gtk.Entry ();
             task_entry.placeholder_text = "What needs to be done?";
             task_entry.hexpand = true;
@@ -77,7 +78,7 @@ namespace Taskit {
             
             var add_task_btn = new Gtk.Button.with_label ("Add");
             add_task_btn.clicked.connect (on_add_task_clicked);
-            add_task_btn.add_css_class ("suggested-action");
+            add_task_btn.add_css_class (Granite.CssClass.SUGGESTED);
             input_box.append (add_task_btn);
             
             content_area.append (input_box);
@@ -91,6 +92,7 @@ namespace Taskit {
             
             task_list = new Gtk.ListBox ();
             task_list.selection_mode = Gtk.SelectionMode.NONE;
+            task_list.add_css_class ("rich-list");
             task_list.add_css_class ("boxed-list");
             scroll.set_child (task_list);
             
@@ -139,11 +141,11 @@ namespace Taskit {
                 if (s_row.id == "all") {
                     current_view = "all";
                     current_project_id = -1;
-                    window_title.subtitle = "All Tasks";
+                    window_title.label = "All Tasks";
                 } else if (s_row.id == "today") {
                     current_view = "today";
                     current_project_id = -1;
-                    window_title.subtitle = "Today";
+                    window_title.label = "Today";
                 } else if (s_row.id.has_prefix ("project_")) {
                     current_view = "project";
                     current_project_id = int.parse (s_row.id.substring (8));
@@ -151,7 +153,7 @@ namespace Taskit {
                     var projects = DatabaseManager.get_instance ().get_all_projects ();
                     foreach (var p in projects) {
                         if (p.id == current_project_id) {
-                            window_title.subtitle = p.name;
+                            window_title.label = p.name;
                             break;
                         }
                     }
@@ -161,7 +163,6 @@ namespace Taskit {
         }
         
         private void on_add_project_clicked () {
-            // Simple prompt for project name (In a real app, use a proper Dialog)
             var dialog = new Adw.MessageDialog (this, "New Project", "");
             
             var entry = new Gtk.Entry ();
@@ -178,7 +179,7 @@ namespace Taskit {
                     if (name != "") {
                         var p = new Models.Project ();
                         p.name = name;
-                        p.color = "#007bff"; // Default color
+                        p.color = "#368aeb"; // elementary blue
                         DatabaseManager.get_instance ().insert_project (p);
                         load_sidebar ();
                     }
@@ -234,7 +235,6 @@ namespace Taskit {
                 if (current_view == "all") {
                     show = true;
                 } else if (current_view == "today") {
-                    // Placeholder logic: would check if due_date is today
                     show = (task.due_date != null && task.due_date != "");
                 } else if (current_view == "project") {
                     show = (task.project_id == current_project_id);
@@ -259,7 +259,7 @@ namespace Taskit {
                 var dialog = new Widgets.TaskDialog (this, task);
                 dialog.task_updated.connect (() => {
                     DatabaseManager.get_instance ().update_task (task);
-                    load_tasks (); // Reload to reflect changes in the list
+                    load_tasks ();
                 });
                 dialog.present ();
             });

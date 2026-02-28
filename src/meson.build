@@ -13,6 +13,7 @@ taskit_sources = [
 taskit_deps = [
   dependency('gtk4'),
   dependency('libadwaita-1'),
+  dependency('granite-7'),
   dependency('sqlite3'),
   dependency('gee-0.8')
 ]
