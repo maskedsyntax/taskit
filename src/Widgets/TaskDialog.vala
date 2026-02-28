@@ -91,22 +91,67 @@ namespace Taskit.Widgets {
             due_date_btn.add_css_class ("flat");
             
             var popover = new Gtk.Popover ();
+            var picker_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
+            picker_box.margin_top = 4;
+            picker_box.margin_bottom = 4;
+            picker_box.margin_start = 4;
+            picker_box.margin_end = 4;
+            
             var calendar = new Gtk.Calendar ();
+            picker_box.append (calendar);
+            
+            var time_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 4);
+            time_box.halign = Gtk.Align.CENTER;
+            
+            var hour_spin = new Gtk.SpinButton.with_range (0, 23, 1);
+            var min_spin = new Gtk.SpinButton.with_range (0, 59, 1);
+            
+            // Initializing values from current_due_date
             if (current_due_date != "") {
-                // Parse date to set calendar
-                var parts = current_due_date.split ("-");
-                if (parts.length == 3) {
-                    var dt = new DateTime.local (int.parse (parts[0]), int.parse (parts[1]), int.parse (parts[2]), 0, 0, 0);
+                var parts = current_due_date.split (" ");
+                var date_parts = parts[0].split ("-");
+                if (date_parts.length == 3) {
+                    var dt = new DateTime.local (int.parse (date_parts[0]), int.parse (date_parts[1]), int.parse (date_parts[2]), 0, 0, 0);
                     calendar.select_day (dt);
                 }
+                if (parts.length == 2) {
+                    var time_parts = parts[1].split (":");
+                    if (time_parts.length == 2) {
+                        hour_spin.set_value (int.parse (time_parts[0]));
+                        min_spin.set_value (int.parse (time_parts[1]));
+                    }
+                } else {
+                    hour_spin.set_value (12);
+                    min_spin.set_value (0);
+                }
+            } else {
+                hour_spin.set_value (12);
+                min_spin.set_value (0);
             }
+            
+            time_box.append (new Gtk.Label ("Time:"));
+            time_box.append (hour_spin);
+            time_box.append (new Gtk.Label (":"));
+            time_box.append (min_spin);
+            picker_box.append (time_box);
             
             calendar.day_selected.connect (() => {
                 var dt = calendar.get_date ();
-                current_due_date = dt.format ("%Y-%m-%d");
+                current_due_date = dt.format ("%Y-%m-%d") + " " + "%02g:%02g".printf (hour_spin.get_value (), min_spin.get_value ());
                 due_date_btn.set_label (current_due_date);
             });
-            popover.set_child (calendar);
+            hour_spin.value_changed.connect (() => {
+                var dt = calendar.get_date ();
+                current_due_date = dt.format ("%Y-%m-%d") + " " + "%02g:%02g".printf (hour_spin.get_value (), min_spin.get_value ());
+                due_date_btn.set_label (current_due_date);
+            });
+            min_spin.value_changed.connect (() => {
+                var dt = calendar.get_date ();
+                current_due_date = dt.format ("%Y-%m-%d") + " " + "%02g:%02g".printf (hour_spin.get_value (), min_spin.get_value ());
+                due_date_btn.set_label (current_due_date);
+            });
+            
+            popover.set_child (picker_box);
             due_date_btn.clicked.connect (() => {
                 popover.set_parent (due_date_btn);
                 popover.popup ();

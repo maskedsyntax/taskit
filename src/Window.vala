@@ -94,14 +94,49 @@ namespace Taskit {
             date_btn.add_css_class ("flat");
             
             var popover = new Gtk.Popover ();
+            var picker_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
+            picker_box.margin_top = 4;
+            picker_box.margin_bottom = 4;
+            picker_box.margin_start = 4;
+            picker_box.margin_end = 4;
+            
             var calendar = new Gtk.Calendar ();
+            picker_box.append (calendar);
+            
+            var time_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 4);
+            time_box.halign = Gtk.Align.CENTER;
+            
+            var hour_spin = new Gtk.SpinButton.with_range (0, 23, 1);
+            hour_spin.set_value (12);
+            var min_spin = new Gtk.SpinButton.with_range (0, 59, 1);
+            min_spin.set_value (0);
+            
+            time_box.append (new Gtk.Label ("Time:"));
+            time_box.append (hour_spin);
+            time_box.append (new Gtk.Label (":"));
+            time_box.append (min_spin);
+            picker_box.append (time_box);
+            
             calendar.day_selected.connect (() => {
                 var dt = calendar.get_date ();
-                selected_date = dt.format ("%Y-%m-%d");
+                selected_date = dt.format ("%Y-%m-%d") + " " + "%02g:%02g".printf (hour_spin.get_value (), min_spin.get_value ());
                 date_btn.tooltip_text = "Deadline: " + selected_date;
                 date_btn.add_css_class ("suggested-action");
             });
-            popover.set_child (calendar);
+            
+            // Also update when time changes
+            hour_spin.value_changed.connect (() => {
+                var dt = calendar.get_date ();
+                selected_date = dt.format ("%Y-%m-%d") + " " + "%02g:%02g".printf (hour_spin.get_value (), min_spin.get_value ());
+                date_btn.tooltip_text = "Deadline: " + selected_date;
+            });
+            min_spin.value_changed.connect (() => {
+                var dt = calendar.get_date ();
+                selected_date = dt.format ("%Y-%m-%d") + " " + "%02g:%02g".printf (hour_spin.get_value (), min_spin.get_value ());
+                date_btn.tooltip_text = "Deadline: " + selected_date;
+            });
+            
+            popover.set_child (picker_box);
             date_btn.clicked.connect (() => {
                 popover.set_parent (date_btn);
                 popover.popup ();
@@ -274,7 +309,9 @@ namespace Taskit {
                 if (current_view == "all") {
                     show = true;
                 } else if (current_view == "today") {
-                    show = (task.due_date != null && task.due_date != "");
+                    var now = new DateTime.now_local ();
+                    var today_str = now.format ("%Y-%m-%d");
+                    show = (task.due_date != null && task.due_date.has_prefix (today_str));
                 } else if (current_view == "project") {
                     show = (task.project_id == current_project_id);
                 }

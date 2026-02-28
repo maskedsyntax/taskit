@@ -47,10 +47,10 @@ namespace Taskit.Widgets {
                 date_label.add_css_class ("small-label");
                 date_label.margin_end = 8;
                 
-                // Overdue check
+                // Overdue check (precision to minutes)
                 var now = new DateTime.now_local ();
-                var today_str = now.format ("%Y-%m-%d");
-                if (task.due_date.strip () != "" && task.due_date.strip () < today_str && !task.is_completed) {
+                var now_str = now.format ("%Y-%m-%d %H:%M");
+                if (task.due_date.strip () != "" && task.due_date.strip () < now_str && !task.is_completed) {
                     date_label.add_css_class ("overdue");
                     date_label.remove_css_class (Granite.CssClass.DIM);
                 }
