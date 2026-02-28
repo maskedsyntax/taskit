@@ -24,30 +24,40 @@ namespace Taskit {
         private void build_ui () {
             var main_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             
-            var header_bar = new Gtk.HeaderBar ();
-            window_title = new Granite.HeaderLabel ("Taskit");
-            header_bar.set_title_widget (window_title);
+            // Compact Toolbar instead of HeaderBar (No window decorations)
+            var toolbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+            toolbar.add_css_class ("compact-toolbar");
+            toolbar.margin_top = 4;
+            toolbar.margin_bottom = 4;
+            toolbar.margin_start = 8;
+            toolbar.margin_end = 8;
             
             var add_project_btn = new Gtk.Button.from_icon_name ("taskit-folder-new-symbolic");
             add_project_btn.tooltip_text = "New Project";
             add_project_btn.add_css_class ("flat");
             add_project_btn.clicked.connect (on_add_project_clicked);
-            header_bar.pack_start (add_project_btn);
+            toolbar.append (add_project_btn);
+            
+            window_title = new Granite.HeaderLabel ("Taskit");
+            window_title.hexpand = true;
+            window_title.halign = Gtk.Align.CENTER;
+            toolbar.append (window_title);
             
             var search_entry = new Gtk.SearchEntry ();
-            search_entry.placeholder_text = "Search tasks...";
+            search_entry.placeholder_text = "Search...";
+            search_entry.width_request = 150;
             search_entry.search_changed.connect (() => {
                 var query = search_entry.get_text ().down ();
                 filter_tasks_by_query (query);
             });
-            header_bar.pack_end (search_entry);
+            toolbar.append (search_entry);
             
-            main_box.append (header_bar);
+            main_box.append (toolbar);
             
             var paned = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             paned.vexpand = true;
             paned.hexpand = true;
-            paned.position = 250;
+            paned.position = 200;
             
             // Sidebar
             var sidebar_scroll = new Gtk.ScrolledWindow ();
@@ -61,16 +71,16 @@ namespace Taskit {
             sidebar_scroll.set_child (sidebar_list);
             
             // Main Content Area
-            var content_area = new Gtk.Box (Gtk.Orientation.VERTICAL, 10);
-            content_area.margin_top = 24;
-            content_area.margin_start = 48;
-            content_area.margin_end = 48;
-            content_area.margin_bottom = 24;
+            var content_area = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
+            content_area.margin_top = 8;
+            content_area.margin_start = 12;
+            content_area.margin_end = 12;
+            content_area.margin_bottom = 8;
             
             // Input for new task
-            var input_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+            var input_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 8);
             task_entry = new Gtk.Entry ();
-            task_entry.placeholder_text = "What needs to be done?";
+            task_entry.placeholder_text = "Task...";
             task_entry.hexpand = true;
             task_entry.activate.connect (on_add_task_clicked);
             

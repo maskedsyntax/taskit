@@ -28,43 +28,50 @@ namespace Taskit {
             // Database init
             DatabaseManager.get_instance().init_db();
             
-            // Elementary-style CSS
+            // Elementary-style CSS (Modified for crispness/compactness)
             var css_provider = new Gtk.CssProvider();
             css_provider.load_from_string("""
-                headerbar {
-                    background: #fcfcfc;
-                    border-bottom: 1px solid #dcdcdc;
-                    padding: 8px 12px;
+                .compact-toolbar {
+                    background: #f8f8f8;
+                    border-bottom: 1px solid #ddd;
+                    min-height: 28px;
                 }
                 
                 .navigation-sidebar {
-                    background-color: #f6f6f6;
-                    border-right: 1px solid #dcdcdc;
+                    background-color: #f0f0f0;
+                    border-right: 1px solid #ddd;
+                }
+                
+                button {
+                    padding: 2px 6px;
+                    min-height: 24px;
                 }
                 
                 button.suggested-action {
                     background-color: #368aeb;
                     color: white;
-                    border-radius: 4px;
+                    border-radius: 2px;
                     border: none;
-                    font-weight: bold;
+                    font-weight: 500;
                 }
                 
-                button.suggested-action:hover {
-                    background-color: #4ea1ff;
+                entry {
+                    border-radius: 2px;
+                    border: 1px solid #ccc;
+                    padding: 2px 6px;
+                    min-height: 24px;
+                    font-size: 9pt;
+                }
+                
+                label {
+                    font-size: 9pt;
                 }
                 
                 .project-folder {
                     background-color: #368aeb;
                     color: white;
-                    border-radius: 4px;
-                    padding: 4px 8px;
-                }
-                
-                entry {
-                    border-radius: 4px;
-                    border: 1px solid #dcdcdc;
-                    padding: 6px 10px;
+                    border-radius: 2px;
+                    padding: 1px 4px;
                 }
                 
                 list {
@@ -72,8 +79,17 @@ namespace Taskit {
                 }
                 
                 .boxed-list {
-                    border: 1px solid #dcdcdc;
-                    border-radius: 6px;
+                    border: 1px solid #eee;
+                    border-radius: 2px;
+                }
+                
+                row {
+                    padding: 2px 6px;
+                    border-bottom: 1px solid #fafafa;
+                }
+                
+                window {
+                    border-radius: 0;
                 }
             """);
             Gtk.StyleContext.add_provider_for_display(
