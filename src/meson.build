@@ -3,6 +3,7 @@ taskit_sources = [
   'Application.vala',
   'Window.vala',
   'DatabaseManager.vala',
+  'NotificationManager.vala',
   'Models/Task.vala',
   'Models/Project.vala',
   'Widgets/TaskRow.vala',
@@ -15,7 +16,8 @@ taskit_deps = [
   dependency('libadwaita-1'),
   dependency('granite-7'),
   dependency('sqlite3'),
-  dependency('gee-0.8')
+  dependency('gee-0.8'),
+  dependency('libnotify')
 ]
 
 taskit_resources = gnome.compile_resources('taskit-resources',

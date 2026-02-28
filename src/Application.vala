@@ -28,6 +28,9 @@ namespace Taskit {
             // Database init
             DatabaseManager.get_instance().init_db();
             
+            // Start notification monitoring
+            NotificationManager.get_instance ().start_monitoring ();
+            
             // Elementary-style CSS (Modified for crispness/compactness)
             var css_provider = new Gtk.CssProvider();
             css_provider.load_from_string("""
