@@ -4,7 +4,8 @@ namespace Taskit.Widgets {
         
         private Gtk.Entry title_entry;
         private Gtk.TextView desc_view;
-        private Gtk.Entry due_date_entry;
+        private Gtk.Button due_date_btn;
+        private string current_due_date = "";
         private Gtk.DropDown priority_dropdown;
         
         public signal void task_updated ();
@@ -19,6 +20,7 @@ namespace Taskit.Widgets {
             );
             
             this.task = task;
+            this.current_due_date = task.due_date;
             build_ui ();
         }
         
@@ -84,12 +86,34 @@ namespace Taskit.Widgets {
             // Due Date
             var date_label = new Gtk.Label ("Due Date");
             date_label.halign = Gtk.Align.START;
-            due_date_entry = new Gtk.Entry ();
-            due_date_entry.placeholder_text = "YYYY-MM-DD";
-            if (task.due_date != null) due_date_entry.set_text (task.due_date);
+            
+            due_date_btn = new Gtk.Button.with_label (current_due_date != "" ? current_due_date : "None");
+            due_date_btn.add_css_class ("flat");
+            
+            var popover = new Gtk.Popover ();
+            var calendar = new Gtk.Calendar ();
+            if (current_due_date != "") {
+                // Parse date to set calendar
+                var parts = current_due_date.split ("-");
+                if (parts.length == 3) {
+                    var dt = new DateTime.local (int.parse (parts[0]), int.parse (parts[1]), int.parse (parts[2]), 0, 0, 0);
+                    calendar.select_day (dt);
+                }
+            }
+            
+            calendar.day_selected.connect (() => {
+                var dt = calendar.get_date ();
+                current_due_date = dt.format ("%Y-%m-%d");
+                due_date_btn.set_label (current_due_date);
+            });
+            popover.set_child (calendar);
+            due_date_btn.clicked.connect (() => {
+                popover.set_parent (due_date_btn);
+                popover.popup ();
+            });
             
             form_grid.attach (date_label, 0, 1);
-            form_grid.attach (due_date_entry, 1, 1);
+            form_grid.attach (due_date_btn, 1, 1);
             
             content.append (form_grid);
             
@@ -103,7 +127,7 @@ namespace Taskit.Widgets {
             desc_view.get_buffer ().get_bounds (out start, out end);
             task.description = desc_view.get_buffer ().get_text (start, end, false);
             task.priority = (int)priority_dropdown.selected;
-            task.due_date = due_date_entry.get_text ();
+            task.due_date = current_due_date;
             
             task_updated ();
             this.destroy ();

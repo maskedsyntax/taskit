@@ -3,6 +3,8 @@ namespace Taskit {
         private Gtk.ListBox sidebar_list;
         private Gtk.ListBox task_list;
         private Gtk.Entry task_entry;
+        private Gtk.Button date_btn;
+        private string selected_date = "";
         private Granite.HeaderLabel window_title;
         
         private int current_project_id = -1;
@@ -85,6 +87,26 @@ namespace Taskit {
             task_entry.activate.connect (on_add_task_clicked);
             
             input_box.append (task_entry);
+            
+            // Date Picker Popover
+            date_btn = new Gtk.Button.from_icon_name ("taskit-today-symbolic");
+            date_btn.tooltip_text = "Set Deadline";
+            date_btn.add_css_class ("flat");
+            
+            var popover = new Gtk.Popover ();
+            var calendar = new Gtk.Calendar ();
+            calendar.day_selected.connect (() => {
+                var dt = calendar.get_date ();
+                selected_date = dt.format ("%Y-%m-%d");
+                date_btn.tooltip_text = "Deadline: " + selected_date;
+                date_btn.add_css_class ("suggested-action");
+            });
+            popover.set_child (calendar);
+            date_btn.clicked.connect (() => {
+                popover.set_parent (date_btn);
+                popover.popup ();
+            });
+            input_box.append (date_btn);
             
             var add_task_btn = new Gtk.Button.with_label ("Add");
             add_task_btn.clicked.connect (on_add_task_clicked);
@@ -207,11 +229,15 @@ namespace Taskit {
                 task.is_completed = false;
                 task.priority = 1;
                 task.project_id = current_project_id;
+                task.due_date = selected_date;
                 
                 DatabaseManager.get_instance ().insert_task (task);
                 add_task_row (task);
                 
                 task_entry.set_text ("");
+                selected_date = "";
+                date_btn.tooltip_text = "Set Deadline";
+                date_btn.remove_css_class ("suggested-action");
             }
         }
         
