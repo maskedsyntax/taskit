@@ -5,20 +5,27 @@ namespace Taskit.Widgets {
         public signal void task_updated ();
         public signal void task_deleted ();
         public signal void task_edit_requested ();
+        public signal void subtask_add_requested ();
         
         private Gtk.CheckButton check_button;
         private Gtk.Label title_label;
+        private Gtk.Button add_subtask_button;
         private Gtk.Button edit_button;
         private Gtk.Button delete_button;
         
         public TaskRow (Models.Task task) {
             this.task = task;
             
-            var box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 10);
-            box.margin_top = 8;
-            box.margin_bottom = 8;
-            box.margin_start = 12;
-            box.margin_end = 12;
+            var box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+            box.margin_top = 4;
+            box.margin_bottom = 4;
+            box.margin_start = 8;
+            box.margin_end = 8;
+            
+            // Indentation for subtasks
+            if (task.parent_id != -1) {
+                box.margin_start = 32;
+            }
             
             check_button = new Gtk.CheckButton ();
             check_button.active = task.is_completed;
@@ -32,6 +39,32 @@ namespace Taskit.Widgets {
             title_label.ellipsize = Pango.EllipsizeMode.END;
             
             update_title_style ();
+            
+            // Deadline indicator
+            if (task.due_date != null && task.due_date != "") {
+                var date_label = new Gtk.Label (task.due_date);
+                date_label.add_css_class (Granite.CssClass.DIM);
+                date_label.add_css_class ("small-label");
+                date_label.margin_end = 8;
+                
+                // Overdue check
+                var now = new DateTime.now_local ();
+                var today_str = now.format ("%Y-%m-%d");
+                if (task.due_date.strip () != "" && task.due_date.strip () < today_str && !task.is_completed) {
+                    date_label.add_css_class ("overdue");
+                    date_label.remove_css_class (Granite.CssClass.DIM);
+                }
+                
+                box.append (date_label);
+            }
+            
+            add_subtask_button = new Gtk.Button.from_icon_name ("taskit-plus-symbolic");
+            add_subtask_button.valign = Gtk.Align.CENTER;
+            add_subtask_button.add_css_class ("flat");
+            add_subtask_button.tooltip_text = "Add Subtask";
+            add_subtask_button.clicked.connect (() => {
+                subtask_add_requested ();
+            });
             
             edit_button = new Gtk.Button.from_icon_name ("taskit-edit-symbolic");
             edit_button.valign = Gtk.Align.CENTER;
@@ -49,6 +82,7 @@ namespace Taskit.Widgets {
             
             box.append (check_button);
             box.append (title_label);
+            box.append (add_subtask_button);
             box.append (edit_button);
             box.append (delete_button);
             

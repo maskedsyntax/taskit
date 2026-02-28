@@ -91,6 +91,15 @@ namespace Taskit {
                 window {
                     border-radius: 0;
                 }
+                
+                .overdue {
+                    color: #e01b24; /* Red */
+                    font-weight: bold;
+                }
+                
+                .small-label {
+                    font-size: 8pt;
+                }
             """);
             Gtk.StyleContext.add_provider_for_display(
                 Gdk.Display.get_default(),

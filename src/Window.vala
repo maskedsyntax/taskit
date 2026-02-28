@@ -239,8 +239,11 @@ namespace Taskit {
                 child = next;
             }
             
-            var tasks = DatabaseManager.get_instance ().get_all_tasks ();
-            foreach (var task in tasks) {
+            var all_tasks = DatabaseManager.get_instance ().get_all_tasks ();
+            
+            // First, identify which tasks to show in the current view
+            var visible_tasks = new Gee.ArrayList<Models.Task> ();
+            foreach (var task in all_tasks) {
                 bool show = false;
                 if (current_view == "all") {
                     show = true;
@@ -250,8 +253,31 @@ namespace Taskit {
                     show = (task.project_id == current_project_id);
                 }
                 
-                if (show) {
+                if (show) visible_tasks.add (task);
+            }
+            
+            // For tasks to be added, we track if they've been added to prevent duplicates
+            var added_ids = new Gee.HashSet<int> ();
+            
+            foreach (var task in visible_tasks) {
+                if (task.parent_id == -1 && !added_ids.contains(task.id)) {
                     add_task_row (task);
+                    added_ids.add(task.id);
+                    // Find and add its subtasks immediately after
+                    foreach (var sub in all_tasks) {
+                        if (sub.parent_id == task.id) {
+                            add_task_row (sub);
+                            added_ids.add(sub.id);
+                        }
+                    }
+                }
+            }
+            
+            // Add orphaned tasks (tasks that should be visible but their parents aren't or aren't in view)
+            foreach (var task in visible_tasks) {
+                if (!added_ids.contains(task.id)) {
+                    add_task_row (task);
+                    added_ids.add(task.id);
                 }
             }
         }
@@ -260,10 +286,44 @@ namespace Taskit {
             var row = new Widgets.TaskRow (task);
             row.task_updated.connect (() => {
                 DatabaseManager.get_instance ().update_task (task);
+                
+                // 1. If parent is checked/unchecked, update all subtasks
+                if (task.parent_id == -1) {
+                    var all_tasks = DatabaseManager.get_instance ().get_all_tasks ();
+                    var updated = false;
+                    foreach (var sub in all_tasks) {
+                        if (sub.parent_id == task.id && sub.is_completed != task.is_completed) {
+                            sub.is_completed = task.is_completed;
+                            DatabaseManager.get_instance ().update_task (sub);
+                            updated = true;
+                        }
+                    }
+                    if (updated) load_tasks ();
+                }
+                
+                // 2. If it's a subtask, check parent completion status
+                if (task.parent_id != -1) {
+                    var all_tasks = DatabaseManager.get_instance ().get_all_tasks ();
+                    Models.Task? parent = null;
+                    var all_subs_done = true;
+                    
+                    foreach (var t in all_tasks) {
+                        if (t.id == task.parent_id) parent = t;
+                        if (t.parent_id == task.parent_id && !t.is_completed) {
+                            all_subs_done = false;
+                        }
+                    }
+                    
+                    if (parent != null && all_subs_done != parent.is_completed) {
+                        parent.is_completed = all_subs_done;
+                        DatabaseManager.get_instance ().update_task (parent);
+                        load_tasks (); // Reload to update UI
+                    }
+                }
             });
             row.task_deleted.connect (() => {
                 DatabaseManager.get_instance ().delete_task (task.id);
-                task_list.remove (row);
+                load_tasks (); // Reload to handle subtask cascade removal
             });
             row.task_edit_requested.connect (() => {
                 var dialog = new Widgets.TaskDialog (this, task);
@@ -272,6 +332,14 @@ namespace Taskit {
                     load_tasks ();
                 });
                 dialog.present ();
+            });
+            row.subtask_add_requested.connect (() => {
+                var subtask = new Models.Task ();
+                subtask.title = "Subtask for: " + task.title;
+                subtask.parent_id = task.id;
+                subtask.project_id = task.project_id;
+                DatabaseManager.get_instance ().insert_task (subtask);
+                load_tasks ();
             });
             task_list.append (row);
         }
