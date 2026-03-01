@@ -1,6 +1,16 @@
-# Taskit
+<div align="center">
+  <img src="data/icons/hicolor/256x256/apps/org.gnome.Taskit.png" width="128" height="128" />
 
-Taskit is a lightweight, intuitive, and modern task management application designed for the GNOME desktop environment. Modeled after the GNOME Todo app, it provides a clean interface for organizing personal and professional tasks, projects, and deadlines.
+  # Taskit
+
+  Taskit is a lightweight, intuitive, and modern task management application designed for the GNOME desktop environment. Modeled after the GNOME Todo app, it provides a clean interface for organizing personal and professional tasks, projects, and deadlines.
+
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![GTK 4](https://img.shields.io/badge/GTK-4-blue.svg)](https://www.gtk.org/)
+  [![Libadwaita](https://img.shields.io/badge/Libadwaita-1-blue.svg)](https://gnome.pages.gitlab.gnome.org/libadwaita/)
+</div>
+
+---
 
 ## Features
 
