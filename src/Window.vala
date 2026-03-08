@@ -294,7 +294,6 @@ namespace Taskit {
             task_list = new Gtk.ListBox ();
             task_list.selection_mode = Gtk.SelectionMode.NONE;
             task_list.add_css_class ("rich-list");
-            task_list.add_css_class ("boxed-list");
             scroll.set_child (task_list);
             
             content_area.append (scroll);
