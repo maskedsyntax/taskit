@@ -39,7 +39,26 @@ namespace Taskit {
             add_project_btn.add_css_class ("flat");
             add_project_btn.clicked.connect (on_add_project_clicked);
             toolbar.append (add_project_btn);
-            
+
+            var undo_btn = new Gtk.Button.from_icon_name ("edit-undo-symbolic");
+            undo_btn.add_css_class ("flat");
+            undo_btn.tooltip_text = "Undo";
+            undo_btn.clicked.connect (() => { HistoryManager.get_instance ().undo (); load_tasks (); });
+            toolbar.append (undo_btn);
+
+            var redo_btn = new Gtk.Button.from_icon_name ("edit-redo-symbolic");
+            redo_btn.add_css_class ("flat");
+            redo_btn.tooltip_text = "Redo";
+            redo_btn.clicked.connect (() => { HistoryManager.get_instance ().redo (); load_tasks (); });
+            toolbar.append (redo_btn);
+
+            HistoryManager.get_instance ().history_changed.connect (() => {
+                undo_btn.sensitive = HistoryManager.get_instance ().can_undo;
+                redo_btn.sensitive = HistoryManager.get_instance ().can_redo;
+            });
+            undo_btn.sensitive = false;
+            redo_btn.sensitive = false;
+
             window_title = new Granite.HeaderLabel ("Taskit");
             window_title.hexpand = true;
             window_title.halign = Gtk.Align.CENTER;
@@ -185,6 +204,7 @@ namespace Taskit {
             // Smart lists
             sidebar_list.append (new Widgets.SidebarRow ("all", "All Tasks", "taskit-all-symbolic"));
             sidebar_list.append (new Widgets.SidebarRow ("today", "Today", "taskit-today-symbolic"));
+            sidebar_list.append (new Widgets.SidebarRow ("scheduled", "Scheduled", "taskit-scheduled-symbolic"));
             
             // Projects header
             var sep = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
@@ -213,6 +233,10 @@ namespace Taskit {
                     current_view = "today";
                     current_project_id = -1;
                     window_title.label = "Today";
+                } else if (s_row.id == "scheduled") {
+                    current_view = "scheduled";
+                    current_project_id = -1;
+                    window_title.label = "Scheduled";
                 } else if (s_row.id.has_prefix ("project_")) {
                     current_view = "project";
                     current_project_id = int.parse (s_row.id.substring (8));
@@ -312,11 +336,19 @@ namespace Taskit {
                     var now = new DateTime.now_local ();
                     var today_str = now.format ("%Y-%m-%d");
                     show = (task.due_date != null && task.due_date.has_prefix (today_str));
+                } else if (current_view == "scheduled") {
+                    show = (task.due_date != null && task.due_date != "");
                 } else if (current_view == "project") {
                     show = (task.project_id == current_project_id);
                 }
                 
                 if (show) visible_tasks.add (task);
+            }
+
+            if (current_view == "scheduled") {
+                visible_tasks.sort ((a, b) => {
+                    return strcmp (a.due_date, b.due_date);
+                });
             }
             
             // For tasks to be added, we track if they've been added to prevent duplicates
@@ -385,6 +417,17 @@ namespace Taskit {
                 }
             });
             row.task_deleted.connect (() => {
+                var all_tasks = DatabaseManager.get_instance ().get_all_tasks ();
+                var subtasks = new Gee.ArrayList<Models.Task> ();
+                foreach (var t in all_tasks) {
+                    if (t.parent_id == task.id) {
+                        subtasks.add (t);
+                    }
+                }
+                
+                var action = new DeleteTaskAction (task, subtasks);
+                HistoryManager.get_instance ().add_action (action);
+                
                 DatabaseManager.get_instance ().delete_task (task.id);
                 load_tasks (); // Reload to handle subtask cascade removal
             });

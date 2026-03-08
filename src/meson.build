@@ -4,6 +4,7 @@ taskit_sources = [
   'Window.vala',
   'DatabaseManager.vala',
   'NotificationManager.vala',
+  'HistoryManager.vala',
   'Models/Task.vala',
   'Models/Project.vala',
   'Widgets/TaskRow.vala',
