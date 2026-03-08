@@ -31,9 +31,14 @@ namespace Taskit {
             // Start notification monitoring
             NotificationManager.get_instance ().start_monitoring ();
             
-            // Adaptive CSS for Dark Mode support
+            // Adaptive CSS for Dark Mode support (Cleaned up focus outlines and shadows)
             var css_provider = new Gtk.CssProvider();
             css_provider.load_from_string("""
+                * {
+                    outline: none;
+                    box-shadow: none;
+                }
+                
                 .compact-toolbar {
                     background: @headerbar_bg_color;
                     border-bottom: 1px solid @border_color;
@@ -48,6 +53,11 @@ namespace Taskit {
                 button {
                     padding: 2px 6px;
                     min-height: 24px;
+                    border: 1px solid transparent;
+                }
+                
+                button:hover {
+                    background-color: alpha(currentColor, 0.1);
                 }
                 
                 button.suggested-action {
@@ -61,6 +71,7 @@ namespace Taskit {
                 entry {
                     border-radius: 2px;
                     border: 1px solid @border_color;
+                    background-color: @view_bg_color;
                     padding: 2px 6px;
                     min-height: 24px;
                     font-size: 9pt;
@@ -88,7 +99,12 @@ namespace Taskit {
                 
                 row {
                     padding: 2px 6px;
-                    border-bottom: 1px solid @border_color;
+                    border-bottom: 1px solid alpha(@border_color, 0.5);
+                }
+                
+                row:selected {
+                    background-color: alpha(@accent_bg_color, 0.2);
+                    color: inherit;
                 }
                 
                 window {
