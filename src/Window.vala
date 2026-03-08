@@ -27,31 +27,33 @@ namespace Taskit {
         private void build_ui () {
             var main_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             
-            // Compact Toolbar instead of HeaderBar (No window decorations)
-            var toolbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+            // Compact Toolbar with vertical centering
+            var toolbar = new Gtk.CenterBox ();
             toolbar.add_css_class ("compact-toolbar");
             toolbar.margin_top = 4;
             toolbar.margin_bottom = 4;
             toolbar.margin_start = 8;
             toolbar.margin_end = 8;
             
+            var left_toolbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+            left_toolbar.valign = Gtk.Align.CENTER;
             var add_project_btn = new Gtk.Button.from_icon_name ("taskit-folder-new-symbolic");
             add_project_btn.tooltip_text = "New Project";
             add_project_btn.add_css_class ("flat");
             add_project_btn.clicked.connect (on_add_project_clicked);
-            toolbar.append (add_project_btn);
+            left_toolbar.append (add_project_btn);
 
             var undo_btn = new Gtk.Button.from_icon_name ("edit-undo-symbolic");
             undo_btn.add_css_class ("flat");
             undo_btn.tooltip_text = "Undo";
             undo_btn.clicked.connect (() => { HistoryManager.get_instance ().undo (); load_tasks (); });
-            toolbar.append (undo_btn);
+            left_toolbar.append (undo_btn);
 
             var redo_btn = new Gtk.Button.from_icon_name ("edit-redo-symbolic");
             redo_btn.add_css_class ("flat");
             redo_btn.tooltip_text = "Redo";
             redo_btn.clicked.connect (() => { HistoryManager.get_instance ().redo (); load_tasks (); });
-            toolbar.append (redo_btn);
+            left_toolbar.append (redo_btn);
 
             HistoryManager.get_instance ().history_changed.connect (() => {
                 undo_btn.sensitive = HistoryManager.get_instance ().can_undo;
@@ -59,7 +61,16 @@ namespace Taskit {
             });
             undo_btn.sensitive = false;
             redo_btn.sensitive = false;
+            
+            toolbar.set_start_widget (left_toolbar);
 
+            window_title = new Granite.HeaderLabel ("Taskit");
+            window_title.valign = Gtk.Align.CENTER;
+            toolbar.set_center_widget (window_title);
+            
+            var right_toolbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+            right_toolbar.valign = Gtk.Align.CENTER;
+            
             var sort_model = new Gtk.StringList (null);
             sort_model.append ("Manual");
             sort_model.append ("Priority");
@@ -70,21 +81,17 @@ namespace Taskit {
                 current_sort = (int)sort_dropdown.selected;
                 load_tasks ();
             });
-            toolbar.append (sort_dropdown);
+            right_toolbar.append (sort_dropdown);
 
-            window_title = new Granite.HeaderLabel ("Taskit");
-            window_title.hexpand = true;
-            window_title.halign = Gtk.Align.CENTER;
-            toolbar.append (window_title);
-            
             var search_entry = new Gtk.SearchEntry ();
             search_entry.placeholder_text = "Search...";
-            search_entry.width_request = 150;
+            search_entry.width_request = 180;
             search_entry.search_changed.connect (() => {
                 var query = search_entry.get_text ().down ();
                 filter_tasks_by_query (query);
             });
-            toolbar.append (search_entry);
+            right_toolbar.append (search_entry);
+            toolbar.set_end_widget (right_toolbar);
             
             main_box.append (toolbar);
             
@@ -95,6 +102,7 @@ namespace Taskit {
             
             // Sidebar
             var sidebar_scroll = new Gtk.ScrolledWindow ();
+            sidebar_scroll.vexpand = true; // Ensure list takes up space
             sidebar_scroll.hscrollbar_policy = Gtk.PolicyType.NEVER;
             sidebar_scroll.add_css_class (Granite.STYLE_CLASS_SIDEBAR);
             
@@ -112,9 +120,11 @@ namespace Taskit {
             export_box.margin_bottom = 8;
             export_box.margin_start = 8;
             export_box.margin_end = 8;
+            export_box.vexpand = false; // Don't let it take extra space
 
             var json_btn = new Gtk.Button.with_label ("Export JSON");
             json_btn.add_css_class ("flat");
+            json_btn.hexpand = true;
             json_btn.clicked.connect (() => {
                 var chooser = new Gtk.FileChooserNative ("Export JSON", this, Gtk.FileChooserAction.SAVE, "Save", "Cancel");
                 chooser.set_current_name ("tasks.json");
@@ -128,6 +138,7 @@ namespace Taskit {
 
             var ical_btn = new Gtk.Button.with_label ("Export iCal");
             ical_btn.add_css_class ("flat");
+            ical_btn.hexpand = true;
             ical_btn.clicked.connect (() => {
                 var chooser = new Gtk.FileChooserNative ("Export iCal", this, Gtk.FileChooserAction.SAVE, "Save", "Cancel");
                 chooser.set_current_name ("tasks.ics");
@@ -214,7 +225,8 @@ namespace Taskit {
             });
             input_box.append (date_btn);
             
-            var add_task_btn = new Gtk.Button.with_label ("Add");
+            var add_task_btn = new Gtk.Button.with_label ("Add Task");
+            add_task_btn.width_request = 100; // Better width
             add_task_btn.clicked.connect (on_add_task_clicked);
             add_task_btn.add_css_class (Granite.CssClass.SUGGESTED);
             input_box.append (add_task_btn);
@@ -514,7 +526,7 @@ namespace Taskit {
             });
             row.subtask_add_requested.connect (() => {
                 var subtask = new Models.Task ();
-                subtask.title = "Subtask for: " + task.title;
+                subtask.title = "New Subtask";
                 subtask.parent_id = task.id;
                 subtask.project_id = task.project_id;
                 DatabaseManager.get_instance ().insert_task (subtask);
