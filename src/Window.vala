@@ -153,6 +153,43 @@ namespace Taskit {
             export_box.append (json_btn);
             export_box.append (ical_btn);
             sidebar_box.append (export_box);
+
+            var import_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 4);
+            import_box.margin_bottom = 8;
+            import_box.margin_start = 8;
+            import_box.margin_end = 8;
+
+            var import_json_btn = new Gtk.Button.with_label ("Import JSON");
+            import_json_btn.add_css_class ("flat");
+            import_json_btn.hexpand = true;
+            import_json_btn.clicked.connect (() => {
+                var chooser = new Gtk.FileChooserNative ("Import JSON", this, Gtk.FileChooserAction.OPEN, "Open", "Cancel");
+                chooser.response.connect ((res) => {
+                    if (res == Gtk.ResponseType.ACCEPT) {
+                        ExportManager.import_from_json (chooser.get_file ().get_path ());
+                        load_tasks ();
+                    }
+                });
+                chooser.show ();
+            });
+
+            var import_ical_btn = new Gtk.Button.with_label ("Import iCal");
+            import_ical_btn.add_css_class ("flat");
+            import_ical_btn.hexpand = true;
+            import_ical_btn.clicked.connect (() => {
+                var chooser = new Gtk.FileChooserNative ("Import iCal", this, Gtk.FileChooserAction.OPEN, "Open", "Cancel");
+                chooser.response.connect ((res) => {
+                    if (res == Gtk.ResponseType.ACCEPT) {
+                        ExportManager.import_from_ical (chooser.get_file ().get_path ());
+                        load_tasks ();
+                    }
+                });
+                chooser.show ();
+            });
+
+            import_box.append (import_json_btn);
+            import_box.append (import_ical_btn);
+            sidebar_box.append (import_box);
             
             // Main Content Area
             var content_area = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);

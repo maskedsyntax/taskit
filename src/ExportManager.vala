@@ -64,5 +64,70 @@ namespace Taskit {
                 warning ("Failed to export iCal: %s", e.message);
             }
         }
+
+        public static void import_from_json (string path) {
+            var parser = new Json.Parser ();
+            try {
+                parser.load_from_file (path);
+                var root = parser.get_root ();
+                if (root == null || root.get_node_type () != Json.NodeType.ARRAY) return;
+                
+                var array = root.get_array ();
+                foreach (var element in array.get_elements ()) {
+                    var obj = element.get_object ();
+                    var task = new Models.Task ();
+                    task.title = obj.get_string_member ("title");
+                    task.description = obj.get_string_member ("description");
+                    task.is_completed = obj.get_boolean_member ("is_completed");
+                    task.priority = (int)obj.get_int_member ("priority");
+                    task.due_date = obj.get_string_member ("due_date");
+                    task.project_id = (int)obj.get_int_member ("project_id");
+                    task.parent_id = (int)obj.get_int_member ("parent_id");
+                    task.tags = obj.get_string_member ("tags");
+                    task.attachments = obj.get_string_member ("attachments");
+                    
+                    DatabaseManager.get_instance ().insert_task (task);
+                }
+            } catch (GLib.Error e) {
+                warning ("Failed to import JSON: %s", e.message);
+            }
+        }
+
+        public static void import_from_ical (string path) {
+            try {
+                string content;
+                FileUtils.get_contents (path, out content);
+                var lines = content.split ("\n");
+                Models.Task? current_task = null;
+                
+                foreach (var line in lines) {
+                    var l = line.strip ();
+                    if (l == "BEGIN:VTODO") {
+                        current_task = new Models.Task ();
+                    } else if (l == "END:VTODO" && current_task != null) {
+                        DatabaseManager.get_instance ().insert_task (current_task);
+                        current_task = null;
+                    } else if (current_task != null) {
+                        if (l.has_prefix ("SUMMARY:")) {
+                            current_task.title = l.substring (8);
+                        } else if (l.has_prefix ("DESCRIPTION:")) {
+                            current_task.description = l.substring (12);
+                        } else if (l.has_prefix ("STATUS:COMPLETED")) {
+                            current_task.is_completed = true;
+                        } else if (l.has_prefix ("DUE:")) {
+                            var d = l.substring (4); // YYYYMMDDTHHMMSS00
+                            if (d.length >= 15) {
+                                current_task.due_date = "%s-%s-%s %s:%s".printf (
+                                    d.substring (0, 4), d.substring (4, 2), d.substring (6, 2),
+                                    d.substring (9, 2), d.substring (11, 2)
+                                );
+                            }
+                        }
+                    }
+                }
+            } catch (GLib.Error e) {
+                warning ("Failed to import iCal: %s", e.message);
+            }
+        }
     }
 }
