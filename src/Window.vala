@@ -91,6 +91,20 @@ namespace Taskit {
                 filter_tasks_by_query (query);
             });
             right_toolbar.append (search_entry);
+
+            var theme_btn = new Gtk.Button.from_icon_name ("taskit-theme-symbolic");
+            theme_btn.add_css_class ("flat");
+            theme_btn.tooltip_text = "Toggle Dark Mode";
+            theme_btn.clicked.connect (() => {
+                var style_manager = Adw.StyleManager.get_default ();
+                if (style_manager.dark) {
+                    style_manager.color_scheme = Adw.ColorScheme.FORCE_LIGHT;
+                } else {
+                    style_manager.color_scheme = Adw.ColorScheme.FORCE_DARK;
+                }
+            });
+            right_toolbar.append (theme_btn);
+
             toolbar.set_end_widget (right_toolbar);
             
             main_box.append (toolbar);

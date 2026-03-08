@@ -31,18 +31,18 @@ namespace Taskit {
             // Start notification monitoring
             NotificationManager.get_instance ().start_monitoring ();
             
-            // Elementary-style CSS (Modified for crispness/compactness)
+            // Adaptive CSS for Dark Mode support
             var css_provider = new Gtk.CssProvider();
             css_provider.load_from_string("""
                 .compact-toolbar {
-                    background: #f8f8f8;
-                    border-bottom: 1px solid #ddd;
+                    background: @headerbar_bg_color;
+                    border-bottom: 1px solid @border_color;
                     min-height: 28px;
                 }
                 
                 .navigation-sidebar {
-                    background-color: #f0f0f0;
-                    border-right: 1px solid #ddd;
+                    background-color: @window_bg_color;
+                    border-right: 1px solid @border_color;
                 }
                 
                 button {
@@ -51,8 +51,8 @@ namespace Taskit {
                 }
                 
                 button.suggested-action {
-                    background-color: #368aeb;
-                    color: white;
+                    background-color: @accent_bg_color;
+                    color: @accent_fg_color;
                     border-radius: 2px;
                     border: none;
                     font-weight: 500;
@@ -60,7 +60,7 @@ namespace Taskit {
                 
                 entry {
                     border-radius: 2px;
-                    border: 1px solid #ccc;
+                    border: 1px solid @border_color;
                     padding: 2px 6px;
                     min-height: 24px;
                     font-size: 9pt;
@@ -71,24 +71,24 @@ namespace Taskit {
                 }
                 
                 .project-folder {
-                    background-color: #368aeb;
-                    color: white;
+                    background-color: @accent_bg_color;
+                    color: @accent_fg_color;
                     border-radius: 2px;
                     padding: 1px 4px;
                 }
                 
                 list {
-                    background-color: white;
+                    background-color: @view_bg_color;
                 }
                 
                 .boxed-list {
-                    border: 1px solid #eee;
+                    border: 1px solid @border_color;
                     border-radius: 2px;
                 }
                 
                 row {
                     padding: 2px 6px;
-                    border-bottom: 1px solid #fafafa;
+                    border-bottom: 1px solid @border_color;
                 }
                 
                 window {
@@ -96,7 +96,7 @@ namespace Taskit {
                 }
                 
                 .overdue {
-                    color: #e01b24; /* Red */
+                    color: @error_color;
                     font-weight: bold;
                 }
                 

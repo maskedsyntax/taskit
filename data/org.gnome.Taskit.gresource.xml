@@ -10,5 +10,6 @@
     <file>icons/scalable/places/taskit-folder-symbolic.svg</file>
     <file>icons/scalable/actions/taskit-folder-new-symbolic.svg</file>
     <file>icons/scalable/actions/taskit-scheduled-symbolic.svg</file>
+    <file>icons/scalable/actions/taskit-theme-symbolic.svg</file>
   </gresource>
 </gresources>
