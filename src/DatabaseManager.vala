@@ -41,7 +41,8 @@ namespace Taskit {
                     due_date TEXT,
                     project_id INTEGER,
                     parent_id INTEGER DEFAULT -1,
-                    tags TEXT DEFAULT ''
+                    tags TEXT DEFAULT '',
+                    attachments TEXT DEFAULT ''
                 );
                 
                 CREATE TABLE IF NOT EXISTS projects (
@@ -59,7 +60,7 @@ namespace Taskit {
         
         public void insert_task (Models.Task task) {
             Statement stmt;
-            string query = "INSERT INTO tasks (title, description, is_completed, priority, due_date, project_id, parent_id, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            string query = "INSERT INTO tasks (title, description, is_completed, priority, due_date, project_id, parent_id, tags, attachments) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             
             if (db.prepare_v2 (query, -1, out stmt, null) == Sqlite.OK) {
                 stmt.bind_text (1, task.title);
@@ -70,6 +71,7 @@ namespace Taskit {
                 stmt.bind_int (6, task.project_id);
                 stmt.bind_int (7, task.parent_id);
                 stmt.bind_text (8, task.tags != null ? task.tags : "");
+                stmt.bind_text (9, task.attachments != null ? task.attachments : "");
                 
                 if (stmt.step () != Sqlite.DONE) {
                     warning ("Error inserting task");
@@ -82,7 +84,7 @@ namespace Taskit {
         public Gee.ArrayList<Models.Task> get_all_tasks () {
             var list = new Gee.ArrayList<Models.Task> ();
             Statement stmt;
-            string query = "SELECT id, title, description, is_completed, priority, due_date, project_id, parent_id, tags FROM tasks";
+            string query = "SELECT id, title, description, is_completed, priority, due_date, project_id, parent_id, tags, attachments FROM tasks";
             
             if (db.prepare_v2 (query, -1, out stmt, null) == Sqlite.OK) {
                 while (stmt.step () == Sqlite.ROW) {
@@ -96,6 +98,7 @@ namespace Taskit {
                     task.project_id = stmt.column_int (6);
                     task.parent_id = stmt.column_int (7);
                     task.tags = stmt.column_text (8);
+                    task.attachments = stmt.column_text (9);
                     list.add (task);
                 }
             }
@@ -105,7 +108,7 @@ namespace Taskit {
         
         public void update_task (Models.Task task) {
             Statement stmt;
-            string query = "UPDATE tasks SET title=?, description=?, is_completed=?, priority=?, due_date=?, project_id=?, parent_id=?, tags=? WHERE id=?";
+            string query = "UPDATE tasks SET title=?, description=?, is_completed=?, priority=?, due_date=?, project_id=?, parent_id=?, tags=?, attachments=? WHERE id=?";
             
             if (db.prepare_v2 (query, -1, out stmt, null) == Sqlite.OK) {
                 stmt.bind_text (1, task.title);
@@ -116,7 +119,8 @@ namespace Taskit {
                 stmt.bind_int (6, task.project_id);
                 stmt.bind_int (7, task.parent_id);
                 stmt.bind_text (8, task.tags != null ? task.tags : "");
-                stmt.bind_int (9, task.id);
+                stmt.bind_text (9, task.attachments != null ? task.attachments : "");
+                stmt.bind_int (10, task.id);
                 
                 if (stmt.step () != Sqlite.DONE) {
                     warning ("Error updating task");

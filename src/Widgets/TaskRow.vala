@@ -39,6 +39,23 @@ namespace Taskit.Widgets {
             title_label.ellipsize = Pango.EllipsizeMode.END;
             
             update_title_style ();
+
+            // Tags display
+            if (task.tags != null && task.tags.strip () != "") {
+                var tags_label = new Gtk.Label (task.tags);
+                tags_label.add_css_class (Granite.CssClass.DIM);
+                tags_label.add_css_class ("small-label");
+                tags_label.margin_start = 8;
+                box.append (tags_label);
+            }
+
+            // Attachments indicator
+            if (task.attachments != null && task.attachments.strip () != "") {
+                var attach_icon = new Gtk.Image.from_icon_name ("mail-attachment-symbolic");
+                attach_icon.add_css_class (Granite.CssClass.DIM);
+                attach_icon.margin_start = 4;
+                box.append (attach_icon);
+            }
             
             // Deadline indicator
             if (task.due_date != null && task.due_date != "") {

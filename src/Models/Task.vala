@@ -9,6 +9,7 @@ namespace Taskit.Models {
         public int project_id { get; set; }
         public int parent_id { get; set; }
         public string tags { get; set; }
+        public string attachments { get; set; }
         
         public Task () {
             id = -1;
@@ -20,6 +21,7 @@ namespace Taskit.Models {
             project_id = -1;
             parent_id = -1;
             tags = "";
+            attachments = "";
         }
     }
 }

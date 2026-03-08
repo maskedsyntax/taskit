@@ -5,6 +5,7 @@ namespace Taskit {
         private Gtk.Entry task_entry;
         private Gtk.Button date_btn;
         private string selected_date = "";
+        private int current_sort = 0; // 0: None, 1: Priority, 2: Deadline, 3: Alphabetical
         private Granite.HeaderLabel window_title;
         
         private int current_project_id = -1;
@@ -59,6 +60,18 @@ namespace Taskit {
             undo_btn.sensitive = false;
             redo_btn.sensitive = false;
 
+            var sort_model = new Gtk.StringList (null);
+            sort_model.append ("Manual");
+            sort_model.append ("Priority");
+            sort_model.append ("Deadline");
+            sort_model.append ("Alphabetical");
+            var sort_dropdown = new Gtk.DropDown (sort_model, null);
+            sort_dropdown.notify["selected"].connect (() => {
+                current_sort = (int)sort_dropdown.selected;
+                load_tasks ();
+            });
+            toolbar.append (sort_dropdown);
+
             window_title = new Granite.HeaderLabel ("Taskit");
             window_title.hexpand = true;
             window_title.halign = Gtk.Align.CENTER;
@@ -90,6 +103,45 @@ namespace Taskit {
             sidebar_list.row_selected.connect (on_sidebar_row_selected);
             
             sidebar_scroll.set_child (sidebar_list);
+
+            var sidebar_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            sidebar_box.append (sidebar_scroll);
+
+            var export_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 4);
+            export_box.margin_top = 8;
+            export_box.margin_bottom = 8;
+            export_box.margin_start = 8;
+            export_box.margin_end = 8;
+
+            var json_btn = new Gtk.Button.with_label ("Export JSON");
+            json_btn.add_css_class ("flat");
+            json_btn.clicked.connect (() => {
+                var chooser = new Gtk.FileChooserNative ("Export JSON", this, Gtk.FileChooserAction.SAVE, "Save", "Cancel");
+                chooser.set_current_name ("tasks.json");
+                chooser.response.connect ((res) => {
+                    if (res == Gtk.ResponseType.ACCEPT) {
+                        ExportManager.export_to_json (chooser.get_file ().get_path ());
+                    }
+                });
+                chooser.show ();
+            });
+
+            var ical_btn = new Gtk.Button.with_label ("Export iCal");
+            ical_btn.add_css_class ("flat");
+            ical_btn.clicked.connect (() => {
+                var chooser = new Gtk.FileChooserNative ("Export iCal", this, Gtk.FileChooserAction.SAVE, "Save", "Cancel");
+                chooser.set_current_name ("tasks.ics");
+                chooser.response.connect ((res) => {
+                    if (res == Gtk.ResponseType.ACCEPT) {
+                        ExportManager.export_to_ical (chooser.get_file ().get_path ());
+                    }
+                });
+                chooser.show ();
+            });
+
+            export_box.append (json_btn);
+            export_box.append (ical_btn);
+            sidebar_box.append (export_box);
             
             // Main Content Area
             var content_area = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
@@ -184,7 +236,7 @@ namespace Taskit {
             
             content_area.append (scroll);
             
-            paned.set_start_child (sidebar_scroll);
+            paned.set_start_child (sidebar_box);
             paned.set_end_child (content_area);
             
             main_box.append (paned);
@@ -305,7 +357,13 @@ namespace Taskit {
             while (child != null) {
                 if (child is Widgets.TaskRow) {
                     var row = (Widgets.TaskRow) child;
-                    if (query == "" || row.task.title.down ().contains (query) || row.task.description.down ().contains (query)) {
+                    var t = row.task;
+                    bool match = (query == "" || 
+                                 t.title.down ().contains (query) || 
+                                 (t.description != null && t.description.down ().contains (query)) ||
+                                 (t.tags != null && t.tags.down ().contains (query)));
+                    
+                    if (match) {
                         row.set_visible (true);
                     } else {
                         row.set_visible (false);
@@ -348,6 +406,21 @@ namespace Taskit {
             if (current_view == "scheduled") {
                 visible_tasks.sort ((a, b) => {
                     return strcmp (a.due_date, b.due_date);
+                });
+            } else if (current_sort == 1) { // Priority
+                visible_tasks.sort ((a, b) => {
+                    return b.priority - a.priority; // High priority first
+                });
+            } else if (current_sort == 2) { // Deadline
+                visible_tasks.sort ((a, b) => {
+                    if (a.due_date == "" && b.due_date == "") return 0;
+                    if (a.due_date == "") return 1;
+                    if (b.due_date == "") return -1;
+                    return strcmp (a.due_date, b.due_date);
+                });
+            } else if (current_sort == 3) { // Alphabetical
+                visible_tasks.sort ((a, b) => {
+                    return strcmp (a.title.down (), b.title.down ());
                 });
             }
             

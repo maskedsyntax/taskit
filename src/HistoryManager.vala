@@ -34,8 +34,8 @@ namespace Taskit {
         public signal void history_changed ();
 
         private HistoryManager () {
-            undo_stack = new Gee.ArrayDeque<HistoryAction> ();
-            redo_stack = new Gee.ArrayDeque<HistoryAction> ();
+            undo_stack = new Gee.LinkedList<HistoryAction> ();
+            redo_stack = new Gee.LinkedList<HistoryAction> ();
         }
 
         public static HistoryManager get_instance () {
@@ -46,9 +46,9 @@ namespace Taskit {
         }
 
         public void add_action (HistoryAction action) {
-            undo_stack.add_first (action);
+            undo_stack.offer_head (action);
             if (undo_stack.size > MAX_HISTORY) {
-                undo_stack.remove_last ();
+                undo_stack.poll_tail ();
             }
             redo_stack.clear ();
             history_changed ();
@@ -56,17 +56,17 @@ namespace Taskit {
 
         public void undo () {
             if (undo_stack.is_empty) return;
-            var action = undo_stack.remove_first ();
+            var action = undo_stack.poll_head ();
             action.undo ();
-            redo_stack.add_first (action);
+            redo_stack.offer_head (action);
             history_changed ();
         }
 
         public void redo () {
             if (redo_stack.is_empty) return;
-            var action = redo_stack.remove_first ();
+            var action = redo_stack.poll_head ();
             action.redo ();
-            undo_stack.add_first (action);
+            undo_stack.offer_head (action);
             history_changed ();
         }
 
