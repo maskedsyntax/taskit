@@ -56,6 +56,11 @@ namespace Taskit {
             if (db.exec (query, null, out errmsg) != Sqlite.OK) {
                 warning ("Error creating table: %s", (string)errmsg);
             }
+
+            // Migrations: Add missing columns if they don't exist
+            db.exec ("ALTER TABLE tasks ADD COLUMN parent_id INTEGER DEFAULT -1", null, null);
+            db.exec ("ALTER TABLE tasks ADD COLUMN tags TEXT DEFAULT ''", null, null);
+            db.exec ("ALTER TABLE tasks ADD COLUMN attachments TEXT DEFAULT ''", null, null);
         }
         
         public void insert_task (Models.Task task) {
@@ -74,10 +79,12 @@ namespace Taskit {
                 stmt.bind_text (9, task.attachments != null ? task.attachments : "");
                 
                 if (stmt.step () != Sqlite.DONE) {
-                    warning ("Error inserting task");
+                    warning ("Error inserting task: %s", db.errmsg ());
                 }
                 
                 task.id = (int)db.last_insert_rowid ();
+            } else {
+                warning ("Failed to prepare insert statement: %s", db.errmsg ());
             }
         }
         
@@ -101,6 +108,8 @@ namespace Taskit {
                     task.attachments = stmt.column_text (9);
                     list.add (task);
                 }
+            } else {
+                warning ("Failed to prepare select statement: %s", db.errmsg ());
             }
             
             return list;
@@ -123,8 +132,10 @@ namespace Taskit {
                 stmt.bind_int (10, task.id);
                 
                 if (stmt.step () != Sqlite.DONE) {
-                    warning ("Error updating task");
+                    warning ("Error updating task: %s", db.errmsg ());
                 }
+            } else {
+                warning ("Failed to prepare update statement: %s", db.errmsg ());
             }
         }
         

@@ -266,10 +266,17 @@ namespace Taskit {
             }
             
             // Smart lists
-            sidebar_list.append (new Widgets.SidebarRow ("all", "All Tasks", "taskit-all-symbolic"));
-            sidebar_list.append (new Widgets.SidebarRow ("today", "Today", "taskit-today-symbolic"));
-            sidebar_list.append (new Widgets.SidebarRow ("scheduled", "Scheduled", "taskit-scheduled-symbolic"));
+            var all_row = new Widgets.SidebarRow ("all", "All Tasks", "taskit-all-symbolic");
+            sidebar_list.append (all_row);
+            var today_row = new Widgets.SidebarRow ("today", "Today", "taskit-today-symbolic");
+            sidebar_list.append (today_row);
+            var scheduled_row = new Widgets.SidebarRow ("scheduled", "Scheduled", "taskit-scheduled-symbolic");
+            sidebar_list.append (scheduled_row);
             
+            if (current_view == "all") sidebar_list.select_row (all_row);
+            else if (current_view == "today") sidebar_list.select_row (today_row);
+            else if (current_view == "scheduled") sidebar_list.select_row (scheduled_row);
+
             // Projects header
             var sep = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
             sep.margin_top = 10;
@@ -281,6 +288,9 @@ namespace Taskit {
                 var row = new Widgets.SidebarRow ("project_" + project.id.to_string(), project.name, "taskit-folder-symbolic");
                 row.set_color (project.color);
                 sidebar_list.append (row);
+                if (current_view == "project" && project.id == current_project_id) {
+                    sidebar_list.select_row (row);
+                }
             }
         }
         
@@ -336,6 +346,10 @@ namespace Taskit {
                         p.name = name;
                         p.color = "#368aeb"; // elementary blue
                         DatabaseManager.get_instance ().insert_project (p);
+                        
+                        current_view = "project";
+                        current_project_id = p.id;
+                        
                         load_sidebar ();
                     }
                 }
