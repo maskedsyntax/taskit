@@ -50,8 +50,8 @@ namespace Taskit {
                     border: none;
                     background: none;
                     box-shadow: none;
-                    padding: 4px 8px;
-                    min-height: 28px;
+                    padding: 2px 6px; /* Ultra-thin padding */
+                    min-height: 20px; /* Reduced height */
                 }
                 
                 button:hover {
@@ -63,14 +63,22 @@ namespace Taskit {
                     color: @accent_fg_color;
                     font-weight: 500;
                     border-radius: 2px;
+                    padding: 2px 10px;
                 }
                 
                 entry {
-                    border: 1px solid alpha(@border_color, 0.3);
-                    background-color: @view_bg_color;
+                    border: 1px solid transparent; /* No default border */
+                    background-color: alpha(currentColor, 0.05); /* Very subtle background */
                     border-radius: 2px;
-                    padding: 4px 8px;
+                    padding: 2px 6px; /* Ultra-thin padding */
+                    min-height: 22px; /* Reduced height */
+                    font-size: 9pt;
                     box-shadow: none;
+                }
+                
+                entry:focus {
+                    border-color: @accent_bg_color; /* Blue focus border */
+                    background-color: @view_bg_color;
                 }
                 
                 list {
