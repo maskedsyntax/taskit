@@ -328,10 +328,16 @@ namespace Taskit {
             else if (current_view == "scheduled") sidebar_list.select_row (scheduled_row);
 
             // Projects header
+            var sep_row = new Gtk.ListBoxRow ();
+            sep_row.selectable = false;
+            sep_row.activatable = false;
+            sep_row.can_focus = false;
+            
             var sep = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
-            sep.margin_top = 10;
-            sep.margin_bottom = 10;
-            sidebar_list.append (sep);
+            sep.margin_top = 4;
+            sep.margin_bottom = 4;
+            sep_row.set_child (sep);
+            sidebar_list.append (sep_row);
             
             var projects = DatabaseManager.get_instance ().get_all_projects ();
             foreach (var project in projects) {
