@@ -19,8 +19,8 @@ namespace Taskit {
                 default_height: 600
             );
             
-            this.width_request = 600;
-            this.height_request = 400;
+            this.width_request = 850;
+            this.height_request = 500;
             
             build_ui ();
             load_sidebar ();
