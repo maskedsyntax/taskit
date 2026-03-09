@@ -31,74 +31,66 @@ namespace Taskit {
             // Start notification monitoring
             NotificationManager.get_instance ().start_monitoring ();
             
-            // Adaptive CSS for Dark Mode support (Refined for crispness, removing redundant borders)
+            // Adaptive CSS for Dark Mode support (Ultra-minimal, zero unnecessary lines)
             var css_provider = new Gtk.CssProvider();
             css_provider.load_from_string("""
                 .compact-toolbar {
                     background: @headerbar_bg_color;
-                    border-bottom: 1px solid alpha(@border_color, 0.3);
-                    min-height: 32px;
+                    border: none;
+                    min-height: 36px;
+                    padding: 0 8px;
                 }
                 
                 .navigation-sidebar {
                     background-color: @window_bg_color;
-                    border-right: 1px solid alpha(@border_color, 0.3);
+                    border-right: 1px solid alpha(@border_color, 0.2);
                 }
                 
                 button {
-                    padding: 2px 6px;
-                    min-height: 24px;
-                }
-                
-                button.flat {
                     border: none;
                     background: none;
                     box-shadow: none;
+                    padding: 4px 8px;
+                    min-height: 28px;
+                }
+                
+                button:hover {
+                    background-color: alpha(currentColor, 0.08);
                 }
                 
                 button.suggested-action {
                     background-color: @accent_bg_color;
                     color: @accent_fg_color;
-                    border-radius: 3px;
-                    border: none;
                     font-weight: 500;
+                    border-radius: 2px;
                 }
                 
                 entry {
-                    border-radius: 3px;
-                    border: 1px solid alpha(@border_color, 0.5);
+                    border: 1px solid alpha(@border_color, 0.3);
                     background-color: @view_bg_color;
+                    border-radius: 2px;
                     padding: 4px 8px;
-                    min-height: 28px;
-                    font-size: 10pt;
+                    box-shadow: none;
                 }
                 
                 list {
                     background-color: transparent;
                 }
                 
-                .boxed-list {
-                    border: none; /* Removed redundant outer border */
-                }
-                
                 row {
-                    padding: 6px 10px;
-                    border-bottom: 1px solid alpha(@border_color, 0.1);
-                    background-color: @view_bg_color;
+                    border: none;
+                    background-color: transparent;
+                    padding: 8px 12px;
+                    margin: 0;
                 }
                 
-                row:last-child {
-                    border-bottom: none;
+                row:hover {
+                    background-color: alpha(currentColor, 0.03);
                 }
                 
                 row:selected {
-                    background-color: alpha(@accent_bg_color, 0.1);
+                    background-color: alpha(@accent_bg_color, 0.15);
                     color: inherit;
-                }
-                
-                /* Remove rounding from rows to make them crisp and joined */
-                row, row > box {
-                    border-radius: 0;
                 }
                 
                 window {
@@ -115,8 +107,9 @@ namespace Taskit {
                 }
                 
                 separator {
-                    background-color: alpha(@border_color, 0.2);
+                    background-color: alpha(@border_color, 0.1);
                     min-height: 1px;
+                    margin: 4px 0;
                 }
             """);
             Gtk.StyleContext.add_provider_for_display(
