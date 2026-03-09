@@ -37,8 +37,22 @@ namespace Taskit {
                 .compact-toolbar {
                     background: @headerbar_bg_color;
                     border: none;
-                    min-height: 36px;
+                    min-height: 32px;
                     padding: 0 8px;
+                }
+                
+                .compact-toolbar box, 
+                .compact-toolbar label, 
+                .compact-toolbar button {
+                    margin: 0;
+                    padding-top: 0;
+                    padding-bottom: 0;
+                    valign: center;
+                }
+                
+                .header-title {
+                    font-weight: bold;
+                    font-size: 11pt;
                 }
                 
                 .navigation-sidebar {
@@ -50,8 +64,8 @@ namespace Taskit {
                     border: none;
                     background: none;
                     box-shadow: none;
-                    padding: 2px 6px; /* Ultra-thin padding */
-                    min-height: 20px; /* Reduced height */
+                    padding: 1px 6px; /* Reduced vertical padding */
+                    min-height: 20px;
                 }
                 
                 button:hover {
@@ -63,21 +77,21 @@ namespace Taskit {
                     color: @accent_fg_color;
                     font-weight: 500;
                     border-radius: 2px;
-                    padding: 2px 10px;
+                    padding: 1px 10px;
                 }
                 
                 entry {
-                    border: 1px solid transparent; /* No default border */
-                    background-color: alpha(currentColor, 0.05); /* Very subtle background */
+                    border: 1px solid transparent;
+                    background-color: alpha(currentColor, 0.05);
                     border-radius: 2px;
-                    padding: 2px 6px; /* Ultra-thin padding */
-                    min-height: 22px; /* Reduced height */
+                    padding: 2px 6px;
+                    min-height: 22px;
                     font-size: 9pt;
                     box-shadow: none;
                 }
                 
                 entry:focus {
-                    border-color: @accent_bg_color; /* Blue focus border */
+                    border-color: @accent_bg_color;
                     background-color: @view_bg_color;
                 }
                 
@@ -88,8 +102,15 @@ namespace Taskit {
                 row {
                     border: none;
                     background-color: transparent;
-                    padding: 8px 12px;
+                    padding: 4px 10px; /* Reduced vertical padding for folders/tasks */
                     margin: 0;
+                }
+                
+                /* Ensure title in header is centered */
+                .compact-toolbar label {
+                    padding: 0;
+                    margin: 0;
+                    valign: center;
                 }
                 
                 row:hover {
@@ -114,10 +135,10 @@ namespace Taskit {
                     font-size: 8pt;
                 }
                 
-                separator {
-                    background-color: alpha(@border_color, 0.1);
+                .sidebar-separator {
+                    background-color: alpha(currentColor, 0.1);
                     min-height: 1px;
-                    margin: 4px 0;
+                    margin: 12px 8px;
                 }
             """);
             Gtk.StyleContext.add_provider_for_display(

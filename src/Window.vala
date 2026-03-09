@@ -6,7 +6,7 @@ namespace Taskit {
         private Gtk.Button date_btn;
         private string selected_date = "";
         private int current_sort = 0; // 0: None, 1: Priority, 2: Deadline, 3: Alphabetical
-        private Granite.HeaderLabel window_title;
+        private Gtk.Label window_title;
         
         private int current_project_id = -1;
         private string current_view = "all"; // "all", "today", "project"
@@ -64,8 +64,9 @@ namespace Taskit {
             
             toolbar.set_start_widget (left_toolbar);
 
-            window_title = new Granite.HeaderLabel ("Taskit");
+            window_title = new Gtk.Label ("Taskit");
             window_title.valign = Gtk.Align.CENTER;
+            window_title.add_css_class ("header-title");
             toolbar.set_center_widget (window_title);
             
             var right_toolbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
@@ -333,10 +334,9 @@ namespace Taskit {
             sep_row.activatable = false;
             sep_row.can_focus = false;
             
-            var sep = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
-            sep.margin_top = 4;
-            sep.margin_bottom = 4;
-            sep_row.set_child (sep);
+            var sep_line = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            sep_line.add_css_class ("sidebar-separator");
+            sep_row.set_child (sep_line);
             sidebar_list.append (sep_row);
             
             var projects = DatabaseManager.get_instance ().get_all_projects ();
