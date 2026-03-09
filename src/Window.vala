@@ -93,11 +93,24 @@ namespace Taskit {
             });
             right_toolbar.append (search_entry);
 
-            var theme_btn = new Gtk.Button.from_icon_name ("taskit-theme-symbolic");
+            var theme_btn = new Gtk.Button ();
             theme_btn.add_css_class ("flat");
             theme_btn.tooltip_text = "Toggle Dark Mode";
+            
+            var style_manager = Adw.StyleManager.get_default ();
+            style_manager.notify["dark"].connect (() => {
+                if (style_manager.dark) {
+                    theme_btn.icon_name = "taskit-sun-symbolic";
+                } else {
+                    theme_btn.icon_name = "taskit-theme-symbolic";
+                }
+            });
+            
+            // Initial icon
+            if (style_manager.dark) theme_btn.icon_name = "taskit-sun-symbolic";
+            else theme_btn.icon_name = "taskit-theme-symbolic";
+            
             theme_btn.clicked.connect (() => {
-                var style_manager = Adw.StyleManager.get_default ();
                 if (style_manager.dark) {
                     style_manager.color_scheme = Adw.ColorScheme.FORCE_LIGHT;
                 } else {
