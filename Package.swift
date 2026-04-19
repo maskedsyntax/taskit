@@ -4,8 +4,7 @@ import PackageDescription
 let package = Package(
     name: "TaskitSwift",
     platforms: [
-        .macOS(.v14),
-        .iOS(.v17)
+        .macOS(.v14)
     ],
     products: [
         .executable(name: "TaskitSwift", targets: ["TaskitSwift"])

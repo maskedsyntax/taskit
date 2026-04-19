@@ -3,17 +3,16 @@
 
   # Taskit
 
-  Native task management for macOS and iOS.
+  Native task management for macOS.
 
   [![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org/)
-  [![SwiftUI](https://img.shields.io/badge/SwiftUI-Universal-blue.svg)](https://developer.apple.com/xcode/swiftui/)
+  [![SwiftUI](https://img.shields.io/badge/SwiftUI-macOS-blue.svg)](https://developer.apple.com/xcode/swiftui/)
   [![macOS](https://img.shields.io/badge/macOS-14.0+-black.svg)](https://www.apple.com/macos/)
-  [![iOS](https://img.shields.io/badge/iOS-17.0+-black.svg)](https://www.apple.com/ios/)
 </div>
 
 ---
 
-Taskit is a task manager built for the Apple ecosystem. It provides a clean interface to organize daily work and personal projects.
+Taskit is a task manager built for macOS. It provides a clean interface to organize daily work and personal projects.
 
 ## Features
 
@@ -32,7 +31,6 @@ Taskit is a task manager built for the Apple ecosystem. It provides a clean inte
 ## Requirements
 
 * macOS 14.0 or later.
-* iOS 17.0 or later.
 
 ## License
 
