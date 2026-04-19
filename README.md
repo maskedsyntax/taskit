@@ -8,11 +8,12 @@
   [![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org/)
   [![SwiftUI](https://img.shields.io/badge/SwiftUI-macOS-blue.svg)](https://developer.apple.com/xcode/swiftui/)
   [![macOS](https://img.shields.io/badge/macOS-14.0+-black.svg)](https://www.apple.com/macos/)
+
+  Taskit is a task manager built for macOS. It provides a clean interface to organize daily work and personal projects.
+
+  <img src="TaskitSwift/Screenshot.png" width="800" />
 </div>
 
----
-
-Taskit is a task manager built for macOS. It provides a clean interface to organize daily work and personal projects.
 
 ## Features
 
