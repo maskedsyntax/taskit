@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="TaskitSwift/AppIcon.png" width="128" height="128" />
+  <img src="TaskitSwift/AppIcon_alt.png" width="128" height="128" />
 
   # Taskit
 
