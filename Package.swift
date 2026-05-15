@@ -15,7 +15,12 @@ let package = Package(
             name: "TaskitSwift",
             dependencies: [],
             path: "TaskitSwift",
-            exclude: ["README.md"]
+            exclude: ["README.md"],
+            resources: [
+                .process("AppIcon.png"),
+                .process("AppIcon_alt.png"),
+                .process("Screenshot.png")
+            ]
         )
     ]
 )

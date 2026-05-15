@@ -7,6 +7,12 @@ class NotificationManager {
     private init() {}
     
     func requestAuthorization() {
+        // Guard against running in an environment without a bundle identifier (like swift run)
+        guard Bundle.main.bundleIdentifier != nil else {
+            print("Skipping notification authorization: No bundle identifier found.")
+            return
+        }
+        
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
             if granted {
                 print("Notification permission granted.")
@@ -17,6 +23,8 @@ class NotificationManager {
     }
     
     func scheduleNotification(for task: Task) {
+        guard Bundle.main.bundleIdentifier != nil else { return }
+        
         guard let dueDate = task.dueDate, !task.isCompleted else {
             cancelNotification(for: task)
             return
@@ -41,6 +49,8 @@ class NotificationManager {
     }
     
     func cancelNotification(for task: Task) {
+        guard Bundle.main.bundleIdentifier != nil else { return }
+        
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [task.id.uuidString])
     }
 }

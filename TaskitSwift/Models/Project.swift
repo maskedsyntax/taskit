@@ -3,7 +3,7 @@ import SwiftData
 import SwiftUI
 
 @Model
-final class Project {
+final class Project: Identifiable {
     var id: UUID
     var name: String
     var colorHex: String

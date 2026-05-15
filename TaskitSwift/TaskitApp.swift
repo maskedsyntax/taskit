@@ -3,6 +3,15 @@ import SwiftData
 
 @main
 struct TaskitApp: App {
+    init() {
+        #if os(macOS)
+        DispatchQueue.main.async {
+            NSApp.setActivationPolicy(.regular)
+            NSApp.activate(ignoringOtherApps: true)
+        }
+        #endif
+    }
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Task.self,
