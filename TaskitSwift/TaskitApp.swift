@@ -16,8 +16,18 @@ struct TaskitApp: App {
         let schema = Schema([
             Task.self,
             Project.self,
+            Tag.self,
+            Attachment.self,
+            TaskTemplate.self
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        
+        // Note: For CloudKit sync to work, all models must have optional or default values for all properties,
+        // and relationships must be optional.
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .automatic
+        )
 
         do {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])

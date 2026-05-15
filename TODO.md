@@ -20,7 +20,7 @@
 ## System Integration
 - [ ] **Widgets:** Create Home & Lock Screen widgets for "Today's Tasks" or "Overdue Tasks".
 - [ ] **App Shortcuts & Siri:** Support adding tasks via voice commands.
-- [ ] **iCloud Sync:** Ensure SwiftData is configured for CloudKit for cross-device sync.
+- [x] **iCloud Sync:** Ensure SwiftData is configured for CloudKit for cross-device sync.
 
 ## Customization
 - [x] **Custom Themes:** Allow users to choose accent colors or background themes.
